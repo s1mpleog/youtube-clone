@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  name          String?
+  email         String?   @unique
+  password      String?
+  username      String
+  emailVerified DateTime?
+  image         String?
+  channel       Channel[]
+  videos        Video[]
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model Channel {
+  id            String         @id @default(auto()) @map("_id") @db.ObjectId
+  name          String         @unique
+  channelHandle String         @unique
+  about         String?        @db.String
+  profilePic    String?        @db.String
+  coverPic      String         @db.String
+  subscribers   BigInt         @default(0)
+  userId        String         @db.ObjectId
+  user          User           @relation(references: [id], fields: [userId])
+  video         Video[]
+  subscription  Subscription[]
+}
+
+model Video {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  url         String    @db.String
+  title       String    @db.String
+  description String?   @db.String
+  userId      String    @db.ObjectId
+  channelId   String    @db.ObjectId
+  views       BigInt    @default(0)
+  like        BigInt    @default(0)
+  dislike     BigInt    @default(0)
+  user        User      @relation(fields: [userId], references: [id])
+  channel     Channel   @relation(fields: [channelId], references: [id])
+  History     History[]
+}
+
+model Subscription {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  channelId String  @db.ObjectId
+  channel   Channel @relation(fields: [channelId], references: [id])
+}
+
+model History {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  videoId String @db.ObjectId
+  video   Video  @relation(fields: [videoId], references: [id])
+}
+
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.String
+  access_token      String? @db.String
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.String
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String   @db.ObjectId
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
