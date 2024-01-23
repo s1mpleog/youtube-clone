@@ -12,13 +12,16 @@ model User {
   name          String?
   email         String?   @unique
   password      String?
-  username      String
+  username      String?  @unique
   emailVerified DateTime?
   image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
   channel       Channel[]
   videos        Video[]
   accounts      Account[]
   sessions      Session[]
+  comments      Comment[]
 }
 
 model Channel {
@@ -31,6 +34,8 @@ model Channel {
   subscribers   BigInt         @default(0)
   userId        String         @db.ObjectId
   user          User           @relation(references: [id], fields: [userId])
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
   video         Video[]
   subscription  Subscription[]
 }
@@ -47,19 +52,37 @@ model Video {
   dislike     BigInt    @default(0)
   user        User      @relation(fields: [userId], references: [id])
   channel     Channel   @relation(fields: [channelId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   History     History[]
+  comment     Comment[]
 }
 
 model Subscription {
-  id        String  @id @default(auto()) @map("_id") @db.ObjectId
-  channelId String  @db.ObjectId
-  channel   Channel @relation(fields: [channelId], references: [id])
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  channelId String   @db.ObjectId
+  channel   Channel  @relation(fields: [channelId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model History {
-  id      String @id @default(auto()) @map("_id") @db.ObjectId
-  videoId String @db.ObjectId
-  video   Video  @relation(fields: [videoId], references: [id])
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  videoId   String   @db.ObjectId
+  video     Video    @relation(fields: [videoId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Comment {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  content   String   @db.String
+  videoId   String   @db.ObjectId
+  userId    String   @db.ObjectId
+  video     Video    @relation(fields: [videoId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Account {

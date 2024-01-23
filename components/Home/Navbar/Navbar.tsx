@@ -1,7 +1,10 @@
 import { Icons } from "@/components/Icons";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Link from "next/link";
 
 export default function Navbar() {
+  const session = false;
   return (
     <div className="text-white pt-4 mx-5 ml-[280px]">
       <div className="flex items-center justify-between">
@@ -15,9 +18,17 @@ export default function Navbar() {
             <Icons.search className="" />
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center justify-center">
           <div>Notification</div>
-          <div>user profile</div>
+          <div>
+            {session ? (
+              <p>user profile</p>
+            ) : (
+              <Link className="" href="/register">
+                <Button variant="ghost">Sign in</Button>
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     </div>

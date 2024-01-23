@@ -17,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={cn("bg-[#181818] text-white", inter.className)}>{children}</body>
+      <body className={cn("sm:mx-0 mx-3", inter.className)}>{children}</body>
     </html>
   );
 }
